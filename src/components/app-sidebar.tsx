@@ -13,15 +13,20 @@ import {
 } from '@/components/ui/sidebar';
 import { Logo } from './logo';
 import { Button } from './ui/button';
+import { getCurrentUser } from '@/lib/auth';
 
 const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/results', label: 'Results', icon: BarChart2 },
-  { href: '/admin', label: 'Admin', icon: Shield },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, adminOnly: false },
+  { href: '/results', label: 'Results', icon: BarChart2, adminOnly: false },
+  { href: '/admin', label: 'Admin', icon: Shield, adminOnly: true },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const user = getCurrentUser();
+  const isAdmin = user.role === 'Admin';
+
+  const availableMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <Sidebar>
@@ -30,7 +35,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {menuItems.map(item => (
+          {availableMenuItems.map(item => (
             <SidebarMenuItem key={item.label}>
               <Link href={item.href} legacyBehavior passHref>
                 <SidebarMenuButton

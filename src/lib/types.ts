@@ -3,11 +3,12 @@ export interface User {
   email: string;
   displayName: string;
   creationDate: Date;
+  role?: 'Admin' | 'User';
 }
 
 export interface Task {
   taskId: string;
-  userId: string;
+  userId:string;
   title: string;
   description?: string;
   isCompleted: boolean;
