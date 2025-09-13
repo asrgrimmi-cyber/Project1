@@ -1,18 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Lightbulb } from 'lucide-react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { pomodoroProcrastinationKiller } from '@/ai/flows/pomodoro-procrastination-killer';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 
 const sessionDurations = {
   Work: 25 * 60,
@@ -28,9 +18,6 @@ export function PomodoroTimer({ taskTitle }: { taskTitle: string }) {
   const [isActive, setIsActive] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const { toast } = useToast();
-
-  const [procrastinationPrompt, setProcrastinationPrompt] = useState('');
-  const [isPromptLoading, setIsPromptLoading] = useState(false);
 
   const nextSession = useCallback(() => {
     let next: SessionType;
@@ -85,18 +72,6 @@ export function PomodoroTimer({ taskTitle }: { taskTitle: string }) {
     setTime(sessionDurations[sessionType]);
   };
   
-  const handleProcrastination = async () => {
-    setIsPromptLoading(true);
-    try {
-      const result = await pomodoroProcrastinationKiller({ taskTitle });
-      setProcrastinationPrompt(result.prompt);
-    } catch(e) {
-      setProcrastinationPrompt("Could not get a suggestion. Just do one small thing!");
-    } finally {
-      setIsPromptLoading(false);
-    }
-  }
-
   const progress = (time / sessionDurations[sessionType]) * 100;
 
   return (
@@ -146,24 +121,8 @@ export function PomodoroTimer({ taskTitle }: { taskTitle: string }) {
         <Button size="icon" className="h-20 w-20 rounded-full text-2xl" onClick={toggleTimer}>
           {isActive ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
         </Button>
-        <Button variant="outline" size="icon" className="h-12 w-12 rounded-full" onClick={handleProcrastination} disabled={isPromptLoading}>
-          <Lightbulb className="h-6 w-6" />
-        </Button>
+        <div className="h-12 w-12"></div>
       </div>
-      
-       <AlertDialog open={!!procrastinationPrompt} onOpenChange={() => setProcrastinationPrompt('')}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Feeling Stuck? Try This!</AlertDialogTitle>
-            <AlertDialogDescription className="text-lg font-medium pt-4 text-foreground">
-              {procrastinationPrompt}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setProcrastinationPrompt('')}>Got it!</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

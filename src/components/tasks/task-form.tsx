@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { CalendarIcon, Sparkles } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
@@ -34,7 +33,6 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { type Task } from '@/lib/types';
-import { suggestTaskContent } from '@/ai/flows/context-aware-task-suggestion';
 import { useToast } from '@/hooks/use-toast';
 
 const taskFormSchema = z.object({
@@ -58,7 +56,6 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
-  const [isSuggesting, setIsSuggesting] = useState(false);
   const { toast } = useToast();
   
   const parentTasks = tasks.filter(t => !t.parentId && t.taskId !== task?.taskId);
@@ -84,36 +81,6 @@ export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
     onSuccess();
   }
 
-  const handleSuggestion = async (type: 'title' | 'description') => {
-    setIsSuggesting(true);
-    try {
-      const existingTasks = tasks.map(t => t.title).join(', ');
-      const category = form.getValues('parentId') 
-        ? tasks.find(t => t.taskId === form.getValues('parentId'))?.title ?? 'General' 
-        : 'General';
-
-      const result = await suggestTaskContent({
-        existingTasks,
-        category,
-        type,
-      });
-
-      if (result.suggestion) {
-        form.setValue(type, result.suggestion);
-      }
-    } catch (error) {
-      console.error('Failed to get suggestion:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Suggestion Failed',
-        description: 'Could not generate a suggestion at this time.',
-      });
-    } finally {
-      setIsSuggesting(false);
-    }
-  };
-
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -128,9 +95,6 @@ export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
                     <FormControl>
                       <Input placeholder="e.g. Design a new logo" {...field} />
                     </FormControl>
-                    <Button type="button" variant="outline" size="icon" onClick={() => handleSuggestion('title')} disabled={isSuggesting}>
-                        <Sparkles className="h-4 w-4" />
-                    </Button>
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -150,9 +114,6 @@ export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
                         {...field}
                       />
                     </FormControl>
-                    <Button type="button" variant="outline" size="icon" onClick={() => handleSuggestion('description')} disabled={isSuggesting}>
-                        <Sparkles className="h-4 w-4" />
-                    </Button>
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -241,7 +202,7 @@ export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
             )}
           />
         </div>
-        <Button type="submit" disabled={isSuggesting}>{task ? 'Update Task' : 'Create Task'}</Button>
+        <Button type="submit">{task ? 'Update Task' : 'Create Task'}</Button>
       </form>
     </Form>
   );
