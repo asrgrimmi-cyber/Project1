@@ -1,6 +1,7 @@
-'use client'
+'use client';
 import { useState } from 'react';
-import { Plus, RotateCcw, Star } from 'lucide-react';
+import { Plus, RotateCcw } from 'lucide-react';
+import { addDays, isBefore } from 'date-fns';
 
 import { AppHeader } from '@/components/app-header';
 import { Button } from '@/components/ui/button';
@@ -16,13 +17,23 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { TaskForm } from '@/components/tasks/task-form';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Task } from '@/lib/types';
+import { Task, TaskWithChildren } from '@/lib/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const Quadrant = ({ title, tasks, onTaskUpdate }: { title: string, tasks: TaskWithChildren[], onTaskUpdate: (task: Task) => void }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle className="text-lg">{title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <TaskList tasks={tasks} onTaskUpdate={onTaskUpdate} />
+    </CardContent>
+  </Card>
+);
+
 
 export default function DashboardPage() {
   const [mockTasks, setMockTasks] = useState<Task[]>(initialMockTasks);
-  const [showHighImpactOnly, setShowHighImpactOnly] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const handleTaskUpdate = (updatedTask: Task) => {
@@ -41,11 +52,17 @@ export default function DashboardPage() {
     );
   };
 
-  const filteredTasks = showHighImpactOnly
-    ? mockTasks.filter(task => task.isHighImpact)
-    : mockTasks;
+  const visibleTasks = mockTasks.filter(task => !task.isCompleted);
 
-  const taskTree = buildTaskTree(filteredTasks);
+  const urgentThreshold = addDays(new Date(), 3);
+
+  const isUrgent = (task: Task) => isBefore(new Date(task.dueDate), urgentThreshold);
+
+  const urgentImportantTasks = buildTaskTree(visibleTasks.filter(t => isUrgent(t) && t.isHighImpact));
+  const notUrgentImportantTasks = buildTaskTree(visibleTasks.filter(t => !isUrgent(t) && t.isHighImpact));
+  const urgentNotImportantTasks = buildTaskTree(visibleTasks.filter(t => isUrgent(t) && !t.isHighImpact));
+  const notUrgentNotImportantTasks = buildTaskTree(visibleTasks.filter(t => !isUrgent(t) && !t.isHighImpact));
+
 
   return (
     <div className="flex flex-1 flex-col">
@@ -53,15 +70,7 @@ export default function DashboardPage() {
       <main className="flex-1 p-4 md:p-6">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
-             <div className="flex items-center space-x-2">
-              <Star className="h-4 w-4 text-amber-400" />
-              <Label htmlFor="high-impact-toggle">High-Impact Only</Label>
-              <Switch 
-                id="high-impact-toggle" 
-                checked={showHighImpactOnly}
-                onCheckedChange={setShowHighImpactOnly}
-              />
-            </div>
+            {/* Future controls can go here */}
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleResetTasks}>
@@ -85,7 +94,13 @@ export default function DashboardPage() {
             </Dialog>
           </div>
         </div>
-        <TaskList tasks={taskTree} onTaskUpdate={handleTaskUpdate} />
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <Quadrant title="Urgent & Important" tasks={urgentImportantTasks} onTaskUpdate={handleTaskUpdate} />
+          <Quadrant title="Not Urgent & Important" tasks={notUrgentImportantTasks} onTaskUpdate={handleTaskUpdate} />
+          <Quadrant title="Urgent & Not Important" tasks={urgentNotImportantTasks} onTaskUpdate={handleTaskUpdate} />
+          <Quadrant title="Not Urgent & Not Important" tasks={notUrgentNotImportantTasks} onTaskUpdate={handleTaskUpdate} />
+        </div>
       </main>
     </div>
   );
