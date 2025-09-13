@@ -4,6 +4,7 @@ export interface User {
   displayName: string;
   creationDate: Date;
   role?: 'Admin' | 'User';
+  status?: 'Active' | 'Invited' | 'Deactivated';
 }
 
 export interface Task {

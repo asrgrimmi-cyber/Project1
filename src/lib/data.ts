@@ -1,11 +1,11 @@
 import type { User, Task } from './types';
 
-export const mockUser: User = {
-  userId: 'user-1',
-  email: 'user@taskzen.com',
-  displayName: 'Alex Doe',
-  creationDate: new Date('2023-01-15T09:00:00Z'),
-};
+export const mockUsers: User[] = [
+    { userId: 'user-1', displayName: 'Alex Doe', email: 'user@focusflow.com', role: 'Admin', status: 'Active', creationDate: new Date('2023-01-15T09:00:00Z') },
+    { userId: 'user-2', displayName: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active', creationDate: new Date('2023-02-10T11:00:00Z') },
+    { userId: 'user-3', displayName: 'Sam Wilson', email: 'sam@example.com', role: 'User', status: 'Invited', creationDate: new Date('2023-03-20T14:30:00Z') },
+];
+
 
 export const mockTasks: Task[] = [
   {

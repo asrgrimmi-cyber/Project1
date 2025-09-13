@@ -1,3 +1,5 @@
+'use client';
+import { useState } from 'react';
 import { AppHeader } from '@/components/app-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -5,14 +7,35 @@ import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-
-const users = [
-    { id: 'usr-1', name: 'Alex Doe', email: 'user@focusflow.com', role: 'Admin', status: 'Active' },
-    { id: 'usr-2', name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active' },
-    { id: 'usr-3', name: 'Sam Wilson', email: 'sam@example.com', role: 'User', status: 'Invited' },
-]
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { UserForm } from '@/components/admin/user-form';
+import { type User } from '@/lib/types';
+import { mockUsers as initialMockUsers } from '@/lib/data';
 
 export default function AdminPage() {
+  const [users, setUsers] = useState<User[]>(initialMockUsers);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setIsFormOpen(true);
+  };
+  
+  const handleDeactivate = (userId: string) => {
+    setUsers(currentUsers =>
+        currentUsers.map(u => u.userId === userId ? { ...u, status: 'Deactivated' } : u)
+    );
+  };
+
+  const handleSuccess = (updatedUser: User) => {
+    setUsers(currentUsers =>
+      currentUsers.map(u => (u.userId === updatedUser.userId ? updatedUser : u))
+    );
+    setIsFormOpen(false);
+    setSelectedUser(null);
+  };
+
   return (
     <div className="flex flex-1 flex-col">
       <AppHeader title="Admin Dashboard" />
@@ -35,13 +58,13 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                         {users.map(user => (
-                            <TableRow key={user.id}>
-                                <TableCell className="font-medium">{user.name}</TableCell>
+                            <TableRow key={user.userId}>
+                                <TableCell className="font-medium">{user.displayName}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.role}</TableCell>
                                 <TableCell>
                                     <Badge variant={user.status === 'Active' ? 'default' : 'secondary'} className={user.status === 'Active' ? 'bg-green-500' : ''}>
-                                        {user.status}
+                                        {user.status || 'Invited'}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
@@ -53,8 +76,8 @@ export default function AdminPage() {
                                         </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem>Deactivate</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => handleEdit(user)}>Edit</DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => handleDeactivate(user.userId)}>Deactivate</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
@@ -65,6 +88,14 @@ export default function AdminPage() {
             </CardContent>
         </Card>
       </main>
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+          </DialogHeader>
+          {selectedUser && <UserForm user={selectedUser} onSuccess={handleSuccess} />}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
