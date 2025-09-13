@@ -38,9 +38,9 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
     }
   };
 
-  const handleImpactChange = () => {
+  const handleTaskPropertyUpdate = (update: Partial<Task>) => {
     if (onTaskUpdate) {
-      onTaskUpdate({ ...task, isHighImpact: !task.isHighImpact });
+      onTaskUpdate({ ...task, ...update });
     }
   };
 
@@ -78,7 +78,7 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
           </CollapsibleTrigger>
           
           <div className="ml-auto flex items-center gap-3">
-            <button onClick={handleImpactChange} className="group">
+            <button onClick={() => handleTaskPropertyUpdate({isHighImpact: !task.isHighImpact})} className="group">
               <Star
                 className={cn(
                   'h-5 w-5 text-muted-foreground/30 transition-all group-hover:text-amber-400 group-hover:scale-110',
@@ -99,7 +99,11 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
               </Badge>
             )}
 
-            <TaskActions task={task} onEdit={() => setIsEditDialogOpen(true)} />
+            <TaskActions 
+              task={task} 
+              onEdit={() => setIsEditDialogOpen(true)} 
+              onTaskUpdate={handleTaskPropertyUpdate}
+            />
           </div>
         </div>
 
