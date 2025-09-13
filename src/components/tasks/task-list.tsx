@@ -1,0 +1,28 @@
+'use client';
+import { TaskWithChildren } from '@/lib/types';
+import { TaskItem } from './task-item';
+
+interface TaskListProps {
+  tasks: TaskWithChildren[];
+}
+
+export function TaskList({ tasks }: TaskListProps) {
+  if (tasks.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted bg-card/50 p-12 text-center">
+        <h3 className="font-headline text-xl font-semibold tracking-tight">You have no tasks yet.</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Click "Add Task" to get started and organize your day.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      {tasks.map(task => (
+        <TaskItem key={task.taskId} task={task} />
+      ))}
+    </div>
+  );
+}

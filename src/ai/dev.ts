@@ -1,1 +1,5 @@
-// Flows will be imported for their side effects in this file.
+import { config } from 'dotenv';
+config();
+
+import '@/ai/flows/context-aware-task-suggestion.ts';
+import '@/ai/flows/pomodoro-procrastination-killer.ts';
