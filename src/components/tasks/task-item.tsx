@@ -21,17 +21,32 @@ import { mockTasks } from '@/lib/data'; // for parent task selection
 interface TaskItemProps {
   task: TaskWithChildren;
   level?: number;
+  onTaskUpdate?: (task: Task) => void;
 }
 
-export function TaskItem({ task, level = 0 }: TaskItemProps) {
-  const [isCompleted, setIsCompleted] = useState(task.isCompleted);
-  const [isHighImpact, setIsHighImpact] = useState(task.isHighImpact);
+export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
   const [isOpen, setIsOpen] = useState(level < 1);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
+  const handleCompletionChange = () => {
+    if (onTaskUpdate) {
+      onTaskUpdate({ 
+        ...task, 
+        isCompleted: !task.isCompleted,
+        completionDate: !task.isCompleted ? new Date() : undefined
+      });
+    }
+  };
+
+  const handleImpactChange = () => {
+    if (onTaskUpdate) {
+      onTaskUpdate({ ...task, isHighImpact: !task.isHighImpact });
+    }
+  };
+
   const hasChildren = task.children.length > 0;
   const dueDate = new Date(task.dueDate);
-  const isOverdue = !isCompleted && dueDate < new Date();
+  const isOverdue = !task.isCompleted && dueDate < new Date();
 
   return (
     <>
@@ -39,15 +54,15 @@ export function TaskItem({ task, level = 0 }: TaskItemProps) {
         <div
           className={cn(
             'flex items-center gap-2 rounded-md p-2 transition-colors hover:bg-card',
-            isCompleted && 'bg-muted/50 hover:bg-muted/60'
+            task.isCompleted && 'bg-muted/50 hover:bg-muted/60'
           )}
           style={{ paddingLeft: `${0.5 + level * 1.5}rem` }}
         >
           <GripVertical className="h-5 w-5 shrink-0 cursor-grab text-muted-foreground/50" />
           <Checkbox
             id={`task-${task.taskId}`}
-            checked={isCompleted}
-            onCheckedChange={() => setIsCompleted(prev => !prev)}
+            checked={task.isCompleted}
+            onCheckedChange={handleCompletionChange}
             className="shrink-0"
           />
 
@@ -56,24 +71,24 @@ export function TaskItem({ task, level = 0 }: TaskItemProps) {
               {hasChildren && <ChevronRight className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-90')} />}
               {!hasChildren && <div className="w-4" />}
               
-              <span className={cn('flex-grow text-sm', isCompleted && 'text-muted-foreground line-through')}>
+              <span className={cn('flex-grow text-sm', task.isCompleted && 'text-muted-foreground line-through')}>
                 {task.title}
               </span>
             </div>
           </CollapsibleTrigger>
           
           <div className="ml-auto flex items-center gap-3">
-            <button onClick={() => setIsHighImpact(prev => !prev)} className="group">
+            <button onClick={handleImpactChange} className="group">
               <Star
                 className={cn(
                   'h-5 w-5 text-muted-foreground/30 transition-all group-hover:text-amber-400 group-hover:scale-110',
-                  isHighImpact && 'fill-amber-400 text-amber-400'
+                  task.isHighImpact && 'fill-amber-400 text-amber-400'
                 )}
               />
             </button>
             <Badge
               variant={isOverdue ? 'destructive' : 'secondary'}
-              className={cn(isCompleted && 'bg-transparent text-muted-foreground')}
+              className={cn(task.isCompleted && 'bg-transparent text-muted-foreground')}
             >
               {formatDistanceToNow(dueDate, { addSuffix: true })}
             </Badge>
@@ -90,7 +105,7 @@ export function TaskItem({ task, level = 0 }: TaskItemProps) {
 
         <CollapsibleContent>
           {task.children.map(child => (
-            <TaskItem key={child.taskId} task={child} level={level + 1} />
+            <TaskItem key={child.taskId} task={child} level={level + 1} onTaskUpdate={onTaskUpdate} />
           ))}
         </CollapsibleContent>
       </Collapsible>

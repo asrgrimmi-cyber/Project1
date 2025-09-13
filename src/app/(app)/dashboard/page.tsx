@@ -1,12 +1,12 @@
 'use client'
 import { useState } from 'react';
-import { Plus, Star } from 'lucide-react';
+import { Plus, RotateCcw, Star } from 'lucide-react';
 
 import { AppHeader } from '@/components/app-header';
 import { Button } from '@/components/ui/button';
 import { TaskList } from '@/components/tasks/task-list';
 import { buildTaskTree } from '@/lib/helpers';
-import { mockTasks } from '@/lib/data';
+import { mockTasks as initialMockTasks } from '@/lib/data';
 import {
   Dialog,
   DialogContent,
@@ -18,10 +18,28 @@ import {
 import { TaskForm } from '@/components/tasks/task-form';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Task } from '@/lib/types';
 
 export default function DashboardPage() {
+  const [mockTasks, setMockTasks] = useState<Task[]>(initialMockTasks);
   const [showHighImpactOnly, setShowHighImpactOnly] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handleTaskUpdate = (updatedTask: Task) => {
+    setMockTasks(currentTasks =>
+      currentTasks.map(t => (t.taskId === updatedTask.taskId ? updatedTask : t))
+    );
+  };
+  
+  const handleResetTasks = () => {
+    setMockTasks(currentTasks => 
+      currentTasks.map(task => ({
+        ...task,
+        isCompleted: false,
+        completionDate: undefined,
+      }))
+    );
+  };
 
   const filteredTasks = showHighImpactOnly
     ? mockTasks.filter(task => task.isHighImpact)
@@ -45,24 +63,29 @@ export default function DashboardPage() {
               />
             </div>
           </div>
-          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Add Task
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[625px]">
-              <DialogHeader>
-                <DialogTitle>Add a new task</DialogTitle>
-                <DialogDescription>
-                  Fill in the details below to create a new task. You can assign it to a parent task to create a hierarchy.
-                </DialogDescription>
-              </DialogHeader>
-              <TaskForm tasks={mockTasks} onSuccess={() => setIsFormOpen(false)} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleResetTasks}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset Tasks
+            </Button>
+            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" /> Add Task
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                  <DialogTitle>Add a new task</DialogTitle>
+                  <DialogDescription>
+                    Fill in the details below to create a new task. You can assign it to a parent task to create a hierarchy.
+                  </DialogDescription>
+                </DialogHeader>
+                <TaskForm tasks={mockTasks} onSuccess={() => setIsFormOpen(false)} />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-        <TaskList tasks={taskTree} />
+        <TaskList tasks={taskTree} onTaskUpdate={handleTaskUpdate} />
       </main>
     </div>
   );
