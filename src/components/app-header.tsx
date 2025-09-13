@@ -46,7 +46,7 @@ export function AppHeader({ title }: AppHeaderProps) {
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">Alex Doe</p>
               <p className="text-xs leading-none text-muted-foreground">
-                user@taskzen.com
+                user@focusflow.com
               </p>
             </div>
           </DropdownMenuLabel>

@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'TaskZen',
+  title: 'FocusFlow',
   description: 'A comprehensive task management application by Firebase Studio',
 };
 

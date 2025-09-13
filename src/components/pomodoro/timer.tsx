@@ -62,7 +62,7 @@ export function PomodoroTimer({ taskTitle }: { taskTitle: string }) {
     // Update document title with time
     document.title = `${Math.floor(time / 60)
       .toString()
-      .padStart(2, '0')}:${(time % 60).toString().padStart(2, '0')} - TaskZen`;
+      .padStart(2, '0')}:${(time % 60).toString().padStart(2, '0')} - FocusFlow`;
   }, [time]);
 
   const toggleTimer = () => setIsActive(!isActive);
