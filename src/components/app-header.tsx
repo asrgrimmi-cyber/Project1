@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,10 +52,14 @@ export function AppHeader({ title }: AppHeaderProps) {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <Link href="/profile" passHref>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+          </Link>
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Log out</DropdownMenuItem>
+           <Link href="/login" passHref>
+            <DropdownMenuItem>Log out</DropdownMenuItem>
+          </Link>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

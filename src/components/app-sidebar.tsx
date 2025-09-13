@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart2, LayoutDashboard, LogOut } from 'lucide-react';
+import { BarChart2, LayoutDashboard, LogOut, Shield } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,7 @@ import { Button } from './ui/button';
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/results', label: 'Results', icon: BarChart2 },
+  { href: '/admin', label: 'Admin', icon: Shield },
 ];
 
 export function AppSidebar() {
@@ -34,7 +35,7 @@ export function AppSidebar() {
               <Link href={item.href} legacyBehavior passHref>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === item.href}
+                  isActive={pathname.startsWith(item.href)}
                   tooltip={{ children: item.label }}
                 >
                   <a>
@@ -48,10 +49,12 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <LogOut className="h-4 w-4" />
-          <span className="group-data-[collapsible=icon]:hidden">Log Out</span>
-        </Button>
+        <Link href="/login" legacyBehavior passHref>
+          <Button variant="ghost" className="w-full justify-start gap-2">
+            <LogOut className="h-4 w-4" />
+            <span className="group-data-[collapsible=icon]:hidden">Log Out</span>
+          </Button>
+        </Link>
       </SidebarFooter>
     </Sidebar>
   );
