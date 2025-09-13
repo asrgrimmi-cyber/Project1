@@ -22,7 +22,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { type User } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
 
 const userFormSchema = z.object({
   displayName: z.string().min(2, {
@@ -40,8 +39,6 @@ interface UserFormProps {
 }
 
 export function UserForm({ user, onSuccess }: UserFormProps) {
-  const { toast } = useToast();
-
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
@@ -54,11 +51,6 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
   async function onSubmit(data: UserFormValues) {
     const updatedUser = { ...user, ...data };
     // In a real app, this would be a server action call
-    console.log(updatedUser);
-    toast({
-        title: 'User Updated',
-        description: `"${data.displayName}" has been saved.`,
-    })
     onSuccess(updatedUser);
   }
 

@@ -11,11 +11,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { UserForm } from '@/components/admin/user-form';
 import { type User } from '@/lib/types';
 import { mockUsers as initialMockUsers } from '@/lib/data';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>(initialMockUsers);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const { toast } = useToast();
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -26,6 +28,13 @@ export default function AdminPage() {
     setUsers(currentUsers =>
         currentUsers.map(u => u.userId === userId ? { ...u, status: 'Deactivated' } : u)
     );
+    const user = users.find(u => u.userId === userId);
+    if (user) {
+      toast({
+        title: 'User Deactivated',
+        description: `"${user.displayName}" has been deactivated.`,
+      });
+    }
   };
 
   const handleSuccess = (updatedUser: User) => {
@@ -34,6 +43,10 @@ export default function AdminPage() {
     );
     setIsFormOpen(false);
     setSelectedUser(null);
+    toast({
+      title: 'User Updated',
+      description: `"${updatedUser.displayName}" has been saved.`,
+    });
   };
 
   return (
