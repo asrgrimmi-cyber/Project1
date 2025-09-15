@@ -4,7 +4,7 @@ import { TaskItem } from './task-item';
 
 interface TaskListProps {
   tasks: TaskWithChildren[];
-  onTaskUpdate?: (task: Task) => void;
+  onTaskUpdate?: (task: Task, update: Partial<Task>) => void;
 }
 
 export function TaskList({ tasks, onTaskUpdate }: TaskListProps) {

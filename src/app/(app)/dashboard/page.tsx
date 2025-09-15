@@ -20,7 +20,7 @@ import { TaskForm } from '@/components/tasks/task-form';
 import { Task, TaskWithChildren } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const Quadrant = ({ title, tasks, onTaskUpdate }: { title: string, tasks: TaskWithChildren[], onTaskUpdate: (task: Task) => void }) => (
+const Quadrant = ({ title, tasks, onTaskUpdate }: { title: string, tasks: TaskWithChildren[], onTaskUpdate: (task: Task, update: Partial<Task>) => void }) => (
   <Card>
     <CardHeader>
       <CardTitle className="text-lg">{title}</CardTitle>
@@ -36,9 +36,9 @@ export default function DashboardPage() {
   const [mockTasks, setMockTasks] = useState<Task[]>(initialMockTasks);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const handleTaskUpdate = (updatedTask: Task) => {
+  const handleTaskUpdate = (taskToUpdate: Task, updatedProperties: Partial<Task>) => {
     setMockTasks(currentTasks =>
-      currentTasks.map(t => (t.taskId === updatedTask.taskId ? updatedTask : t))
+      currentTasks.map(t => (t.taskId === taskToUpdate.taskId ? { ...t, ...updatedProperties } : t))
     );
   };
   

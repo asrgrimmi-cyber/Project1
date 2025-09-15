@@ -21,7 +21,7 @@ import { mockTasks } from '@/lib/data'; // for parent task selection
 interface TaskItemProps {
   task: TaskWithChildren;
   level?: number;
-  onTaskUpdate?: (task: Task) => void;
+  onTaskUpdate?: (task: Task, update: Partial<Task>) => void;
 }
 
 export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
@@ -30,8 +30,7 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
 
   const handleCompletionChange = () => {
     if (onTaskUpdate) {
-      onTaskUpdate({ 
-        ...task, 
+      onTaskUpdate(task, { 
         isCompleted: !task.isCompleted,
         completionDate: !task.isCompleted ? new Date() : undefined
       });
@@ -40,9 +39,15 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
 
   const handleTaskPropertyUpdate = (update: Partial<Task>) => {
     if (onTaskUpdate) {
-      onTaskUpdate({ ...task, ...update });
+      onTaskUpdate(task, { ...update });
     }
   };
+
+  const handleFullTaskUpdate = (updatedTask: Task) => {
+    if (onTaskUpdate) {
+      onTaskUpdate(task, updatedTask);
+    }
+  }
 
   const hasChildren = task.children.length > 0;
   const dueDate = new Date(task.dueDate);
