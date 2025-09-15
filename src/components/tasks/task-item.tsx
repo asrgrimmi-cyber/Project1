@@ -22,9 +22,10 @@ interface TaskItemProps {
   task: TaskWithChildren;
   level?: number;
   onTaskUpdate?: (task: Task, update: Partial<Task>) => void;
+  onTaskDelete?: (task: Task) => void;
 }
 
-export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
+export function TaskItem({ task, level = 0, onTaskUpdate, onTaskDelete }: TaskItemProps) {
   const [isOpen, setIsOpen] = useState(level < 1);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
@@ -48,6 +49,12 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
       onTaskUpdate(task, updatedTask);
     }
   }
+
+  const handleTaskDelete = () => {
+    if (onTaskDelete) {
+      onTaskDelete(task);
+    }
+  };
 
   const hasChildren = task.children.length > 0;
   const dueDate = new Date(task.dueDate);
@@ -108,13 +115,14 @@ export function TaskItem({ task, level = 0, onTaskUpdate }: TaskItemProps) {
               task={task} 
               onEdit={() => setIsEditDialogOpen(true)} 
               onTaskUpdate={handleTaskPropertyUpdate}
+              onDelete={handleTaskDelete}
             />
           </div>
         </div>
 
         <CollapsibleContent>
           {task.children.map(child => (
-            <TaskItem key={child.taskId} task={child} level={level + 1} onTaskUpdate={onTaskUpdate} />
+            <TaskItem key={child.taskId} task={child} level={level + 1} onTaskUpdate={onTaskUpdate} onTaskDelete={onTaskDelete} />
           ))}
         </CollapsibleContent>
       </Collapsible>

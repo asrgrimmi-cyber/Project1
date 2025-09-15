@@ -5,9 +5,10 @@ import { TaskItem } from './task-item';
 interface TaskListProps {
   tasks: TaskWithChildren[];
   onTaskUpdate?: (task: Task, update: Partial<Task>) => void;
+  onTaskDelete?: (task: Task) => void;
 }
 
-export function TaskList({ tasks, onTaskUpdate }: TaskListProps) {
+export function TaskList({ tasks, onTaskUpdate, onTaskDelete }: TaskListProps) {
   if (tasks.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted bg-card/50 p-12 text-center">
@@ -22,7 +23,7 @@ export function TaskList({ tasks, onTaskUpdate }: TaskListProps) {
   return (
     <div className="space-y-1">
       {tasks.map(task => (
-        <TaskItem key={task.taskId} task={task} onTaskUpdate={onTaskUpdate} />
+        <TaskItem key={task.taskId} task={task} onTaskUpdate={onTaskUpdate} onTaskDelete={onTaskDelete} />
       ))}
     </div>
   );

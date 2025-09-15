@@ -20,13 +20,13 @@ import { TaskForm } from '@/components/tasks/task-form';
 import { Task, TaskWithChildren } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const Quadrant = ({ title, tasks, onTaskUpdate }: { title: string, tasks: TaskWithChildren[], onTaskUpdate: (task: Task, update: Partial<Task>) => void }) => (
+const Quadrant = ({ title, tasks, onTaskUpdate, onTaskDelete }: { title: string, tasks: TaskWithChildren[], onTaskUpdate: (task: Task, update: Partial<Task>) => void, onTaskDelete: (task: Task) => void }) => (
   <Card>
     <CardHeader>
       <CardTitle className="text-lg">{title}</CardTitle>
     </CardHeader>
     <CardContent>
-      <TaskList tasks={tasks} onTaskUpdate={onTaskUpdate} />
+      <TaskList tasks={tasks} onTaskUpdate={onTaskUpdate} onTaskDelete={onTaskDelete} />
     </CardContent>
   </Card>
 );
@@ -39,6 +39,12 @@ export default function DashboardPage() {
   const handleTaskUpdate = (taskToUpdate: Task, updatedProperties: Partial<Task>) => {
     setMockTasks(currentTasks =>
       currentTasks.map(t => (t.taskId === taskToUpdate.taskId ? { ...t, ...updatedProperties } : t))
+    );
+  };
+
+  const handleTaskDelete = (taskToDelete: Task) => {
+    setMockTasks(currentTasks =>
+      currentTasks.filter(t => t.taskId !== taskToDelete.taskId)
     );
   };
   
@@ -96,10 +102,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <Quadrant title="Urgent & Important" tasks={urgentImportantTasks} onTaskUpdate={handleTaskUpdate} />
-          <Quadrant title="Not Urgent & Important" tasks={notUrgentImportantTasks} onTaskUpdate={handleTaskUpdate} />
-          <Quadrant title="Urgent & Not Important" tasks={urgentNotImportantTasks} onTaskUpdate={handleTaskUpdate} />
-          <Quadrant title="Not Urgent & Not Important" tasks={notUrgentNotImportantTasks} onTaskUpdate={handleTaskUpdate} />
+          <Quadrant title="Urgent & Important" tasks={urgentImportantTasks} onTaskUpdate={handleTaskUpdate} onTaskDelete={handleTaskDelete} />
+          <Quadrant title="Not Urgent & Important" tasks={notUrgentImportantTasks} onTaskUpdate={handleTaskUpdate} onTaskDelete={handleTaskDelete} />
+          <Quadrant title="Urgent & Not Important" tasks={urgentNotImportantTasks} onTaskUpdate={handleTaskUpdate} onTaskDelete={handleTaskDelete} />
+          <Quadrant title="Not Urgent & Not Important" tasks={notUrgentNotImportantTasks} onTaskUpdate={handleTaskUpdate} onTaskDelete={handleTaskDelete} />
         </div>
       </main>
     </div>

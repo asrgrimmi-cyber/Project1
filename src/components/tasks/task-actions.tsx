@@ -22,13 +22,14 @@ interface TaskActionsProps {
   task: Task;
   onEdit: () => void;
   onTaskUpdate: (task: Partial<Task>) => void;
+  onDelete: () => void;
 }
 
-export function TaskActions({ task, onEdit, onTaskUpdate }: TaskActionsProps) {
+export function TaskActions({ task, onEdit, onTaskUpdate, onDelete }: TaskActionsProps) {
   const { toast } = useToast();
 
   const handleDelete = () => {
-    // In a real app, this would call a server action
+    onDelete();
     toast({
       title: 'Task Deleted',
       description: `"${task.title}" has been deleted.`,
