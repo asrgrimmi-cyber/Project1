@@ -37,16 +37,14 @@ export function AppSidebar() {
         <SidebarMenu>
           {availableMenuItems.map(item => (
             <SidebarMenuItem key={item.label}>
-              <Link href={item.href} legacyBehavior passHref>
+              <Link href={item.href} passHref>
                 <SidebarMenuButton
-                  asChild
+                  as="a"
                   isActive={pathname.startsWith(item.href)}
                   tooltip={{ children: item.label }}
                 >
-                  <a>
                     <item.icon />
                     <span>{item.label}</span>
-                  </a>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
@@ -54,8 +52,8 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <Link href="/login" legacyBehavior passHref>
-          <Button variant="ghost" className="w-full justify-start gap-2">
+        <Link href="/login" passHref>
+          <Button as="a" variant="ghost" className="w-full justify-start gap-2">
             <LogOut className="h-4 w-4" />
             <span className="group-data-[collapsible=icon]:hidden">Log Out</span>
           </Button>
