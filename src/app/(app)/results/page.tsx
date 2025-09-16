@@ -1,3 +1,5 @@
+'use client';
+
 import { CheckCircle, Zap, Clock, TrendingUp } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { StatsCard } from '@/components/dashboard/stats-card';
