@@ -1,30 +1,31 @@
 import { CheckCircle, Zap, Clock, TrendingUp } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
-import { mockTasks } from '@/lib/data';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { ImpactChart } from '@/components/dashboard/impact-chart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { useTasks } from '@/context/task-context';
 
 export default function ResultsPage() {
-  const totalTasks = mockTasks.length;
-  const completedTasks = mockTasks.filter(t => t.isCompleted).length;
+  const { tasks } = useTasks();
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.isCompleted).length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
-  const totalPomodoros = mockTasks.reduce((acc, task) => acc + task.pomodoroSessions, 0);
+  const totalPomodoros = tasks.reduce((acc, task) => acc + task.pomodoroSessions, 0);
   const totalWorkTime = totalPomodoros * 25; // Assuming 25 min per pomodoro
 
-  const highImpactCompleted = mockTasks.filter(t => t.isCompleted && t.isHighImpact).length;
-  const lowImpactCompleted = mockTasks.filter(t => t.isCompleted && !t.isHighImpact).length;
+  const highImpactCompleted = tasks.filter(t => t.isCompleted && t.isHighImpact).length;
+  const lowImpactCompleted = tasks.filter(t => t.isCompleted && !t.isHighImpact).length;
 
   const chartData = {
     highImpact: highImpactCompleted,
     lowImpact: lowImpactCompleted,
   };
 
-  const recentlyCompleted = mockTasks
+  const recentlyCompleted = tasks
     .filter(t => t.isCompleted && t.completionDate)
     .sort((a, b) => new Date(b.completionDate!).getTime() - new Date(a.completionDate!).getTime())
     .slice(0, 5);

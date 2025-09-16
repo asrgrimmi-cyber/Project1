@@ -16,7 +16,7 @@ import {
 import { TaskActions } from './task-actions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { TaskForm } from './task-form';
-import { mockTasks } from '@/lib/data'; // for parent task selection
+import { useTasks } from '@/context/task-context';
 
 interface TaskItemProps {
   task: TaskWithChildren;
@@ -28,6 +28,7 @@ interface TaskItemProps {
 export function TaskItem({ task, level = 0, onTaskUpdate, onTaskDelete }: TaskItemProps) {
   const [isOpen, setIsOpen] = useState(level < 1);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { tasks } = useTasks();
 
   const handleCompletionChange = () => {
     if (onTaskUpdate) {
@@ -132,7 +133,7 @@ export function TaskItem({ task, level = 0, onTaskUpdate, onTaskDelete }: TaskIt
             <DialogTitle>Edit Task</DialogTitle>
           </DialogHeader>
           <TaskForm 
-            tasks={mockTasks} 
+            tasks={tasks} 
             task={task} 
             onSuccess={() => setIsEditDialogOpen(false)} 
           />

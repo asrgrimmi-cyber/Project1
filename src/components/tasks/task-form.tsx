@@ -34,6 +34,7 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { type Task } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { useTasks } from '@/context/task-context';
 
 const taskFormSchema = z.object({
   title: z.string().min(2, {
@@ -52,11 +53,12 @@ type TaskFormValues = z.infer<typeof taskFormSchema>;
 interface TaskFormProps {
   tasks: Task[];
   task?: Task | null;
-  onSuccess: () => void;
+  onSuccess: (data: any) => void;
 }
 
 export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
   const { toast } = useToast();
+  const { updateTask } = useTasks();
   
   const parentTasks = tasks.filter(t => !t.parentId && t.taskId !== task?.taskId);
 
@@ -72,13 +74,20 @@ export function TaskForm({ tasks, task, onSuccess }: TaskFormProps) {
   });
 
   async function onSubmit(data: TaskFormValues) {
-    // Here you would typically call a server action to save the task
-    console.log(data);
+    if (task) {
+      updateTask(task, data);
+    } else {
+      onSuccess(data);
+    }
+    
     toast({
         title: `Task ${task ? 'updated' : 'created'}`,
         description: `"${data.title}" has been saved.`,
     })
-    onSuccess();
+
+    if(task) {
+        onSuccess(data);
+    }
   }
 
   return (

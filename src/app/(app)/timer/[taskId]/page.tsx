@@ -1,10 +1,13 @@
-import { mockTasks } from '@/lib/data';
+'use client';
+
 import { AppHeader } from '@/components/app-header';
 import { PomodoroTimer } from '@/components/pomodoro/timer';
+import { useTasks } from '@/context/task-context';
 import { notFound } from 'next/navigation';
 
 export default function TimerPage({ params }: { params: { taskId: string } }) {
-  const task = mockTasks.find(t => t.taskId === params.taskId);
+  const { tasks } = useTasks();
+  const task = tasks.find(t => t.taskId === params.taskId);
 
   if (!task) {
     notFound();
