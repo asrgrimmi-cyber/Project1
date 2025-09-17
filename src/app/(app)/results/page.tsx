@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle, Zap, Clock, TrendingUp } from 'lucide-react';
+import { CheckCircle, Zap, Clock, TrendingUp, BarChart2 } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { ImpactChart } from '@/components/dashboard/impact-chart';
@@ -10,25 +10,54 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { useTasks } from '@/context/task-context';
 
+function EmptyState() {
+  return (
+    <div className="flex flex-1 items-center justify-center rounded-lg border-2 border-dashed border-muted bg-card/50 p-12 text-center">
+        <div className="flex flex-col items-center gap-4">
+            <BarChart2 className="h-16 w-16 text-muted-foreground" />
+            <div className="text-center">
+                <h3 className="font-headline text-xl font-semibold tracking-tight">No completed tasks yet.</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                    Complete some tasks to see your results and statistics here.
+                </p>
+            </div>
+        </div>
+    </div>
+  );
+}
+
 export default function ResultsPage() {
   const { tasks } = useTasks();
+  const completedTasksList = tasks.filter(t => t.isCompleted);
+
+  if (completedTasksList.length === 0) {
+    return (
+       <div className="flex flex-1 flex-col">
+        <AppHeader title="Results" />
+        <main className="flex-1 p-4 md:p-6">
+            <EmptyState />
+        </main>
+      </div>
+    )
+  }
+
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.isCompleted).length;
+  const completedTasks = completedTasksList.length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
-  const totalPomodoros = tasks.reduce((acc, task) => acc + task.pomodoroSessions, 0);
+  const totalPomodoros = completedTasksList.reduce((acc, task) => acc + task.pomodoroSessions, 0);
   const totalWorkTime = totalPomodoros * 25; // Assuming 25 min per pomodoro
 
-  const highImpactCompleted = tasks.filter(t => t.isCompleted && t.isHighImpact).length;
-  const lowImpactCompleted = tasks.filter(t => t.isCompleted && !t.isHighImpact).length;
+  const highImpactCompleted = completedTasksList.filter(t => t.isHighImpact).length;
+  const lowImpactCompleted = completedTasksList.filter(t => !t.isHighImpact).length;
 
   const chartData = {
     highImpact: highImpactCompleted,
     lowImpact: lowImpactCompleted,
   };
 
-  const recentlyCompleted = tasks
-    .filter(t => t.isCompleted && t.completionDate)
+  const recentlyCompleted = completedTasksList
+    .filter(t => t.completionDate)
     .sort((a, b) => new Date(b.completionDate!).getTime() - new Date(a.completionDate!).getTime())
     .slice(0, 5);
 
@@ -51,7 +80,7 @@ export default function ResultsPage() {
           />
            <StatsCard 
             title="Total Focus Time"
-            value={`${Math.floor(totalWorkTime / 60)}h ${totalWorkTime % 60}m`}
+            value={totalWorkTime > 0 ? `${Math.floor(totalWorkTime / 60)}h ${totalWorkTime % 60}m` : '0m'}
             icon={TrendingUp}
             description="Estimated time in deep work"
           />
