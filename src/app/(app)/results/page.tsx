@@ -1,7 +1,8 @@
 'use client';
 
-import { CheckCircle, Zap, Clock, TrendingUp, BarChart2 } from 'lucide-react';
+import { CheckCircle, Zap, Clock, TrendingUp, BarChart2, RotateCcw } from 'lucide-react';
 import { AppHeader } from '@/components/app-header';
+import { Button } from '@/components/ui/button';
 import { StatsCard } from '@/components/dashboard/stats-card';
 import { ImpactChart } from '@/components/dashboard/impact-chart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,10 +28,13 @@ function EmptyState() {
 }
 
 export default function ResultsPage() {
-  const { tasks } = useTasks();
+  const { tasks, resetTasks } = useTasks();
   const completedTasksList = tasks.filter(t => t.isCompleted);
 
-  if (completedTasksList.length === 0) {
+  const totalTasks = tasks.length;
+  const completedTasks = completedTasksList.length;
+  
+  if (completedTasks === 0) {
     return (
        <div className="flex flex-1 flex-col">
         <AppHeader title="Results" />
@@ -41,8 +45,6 @@ export default function ResultsPage() {
     )
   }
 
-  const totalTasks = tasks.length;
-  const completedTasks = completedTasksList.length;
   const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   
   const totalPomodoros = completedTasksList.reduce((acc, task) => acc + task.pomodoroSessions, 0);
@@ -65,6 +67,12 @@ export default function ResultsPage() {
     <div className="flex flex-1 flex-col">
       <AppHeader title="Results" />
       <main className="flex-1 p-4 md:p-6">
+        <div className="mb-6 flex items-center justify-between">
+            <div />
+            <Button variant="outline" onClick={resetTasks}>
+              <RotateCcw className="mr-2 h-4 w-4" /> Reset All Tasks
+            </Button>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard 
             title="Completion Rate"
